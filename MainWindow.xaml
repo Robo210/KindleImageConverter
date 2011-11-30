@@ -1,0 +1,9 @@
+﻿<Window x:Class="mangle_port.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:mangle_port"
+        Title="Mangle Sharp" Height="350" Width="525">
+    <Window.Content>
+        <local:MainWindowView DataContext="{Binding}" />
+    </Window.Content>
+</Window>
