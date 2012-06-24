@@ -1,22 +1,24 @@
 ﻿// (c) Kyle Sabo 2011
 
-using Ionic.Zip;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Security.AccessControl;
-using System.Threading;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks.Dataflow;
 using System.Windows;
 using System.Windows.Input;
+using Ionic.Zip;
 
 namespace mangle_port
 {
     public class MainWindowViewModel : DependencyObject
     {
         private ObservableCollection<FileConversionInfo> fileList;
+        private ITargetBlock<FileConversionInfo> conversionBlock;
+        private CancellationToken cancellationToken;
 
         private readonly CommandBindingCollection _CommandBindings;
 
@@ -66,8 +68,11 @@ namespace mangle_port
 
         public MainWindowViewModel()
         {
-            fileList = new ObservableCollection<FileConversionInfo>();
-            ImageFileList = fileList;
+            this.fileList = new ObservableCollection<FileConversionInfo>();
+            ImageFileList = this.fileList;
+
+            this.cancellationToken = new CancellationToken();
+            this.conversionBlock = ImageBackend.CreateImageProcessingNetwork(new Kindle.Profiles.Kindle3(), cancellationToken);
 
             this._CommandBindings = new CommandBindingCollection();
             CommandBinding newBinding = new CommandBinding(ApplicationCommands.New, NewCmdExecuted, (s, e) => e.CanExecute = true);
@@ -227,14 +232,20 @@ namespace mangle_port
                 file.Write(info, 0, info.Length);
             } 
 
+            //foreach (FileConversionInfo fileInfo in fileList)
+            //{
+            //    fileInfo.OutputPath = Path.Combine(folder, fileInfo.OutputName);
+            //    ConversionThread thread = new ConversionThread(progressBar);
+            //    ThreadPool.QueueUserWorkItem(thread.ThreadCallback, fileInfo);
+            //}
+
             foreach (FileConversionInfo fileInfo in fileList)
             {
                 fileInfo.OutputPath = Path.Combine(folder, fileInfo.OutputName);
-                ConversionThread thread = new ConversionThread(progressBar);
-                ThreadPool.QueueUserWorkItem(thread.ThreadCallback, fileInfo);
+                this.conversionBlock.Post(fileInfo);
             }
             
-            progressBar.ShowDialog();
+            //progressBar.ShowDialog();
         }
 
         void ExportFilesCanExecute(object sender, CanExecuteRoutedEventArgs e)

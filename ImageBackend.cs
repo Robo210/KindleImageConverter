@@ -1,19 +1,15 @@
 ﻿// (c) Kyle Sabo 2011
 
-using AForge;
-using AForge.Imaging;
+using System;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks.Dataflow;
 using AForge.Imaging.ColorReduction;
 using AForge.Imaging.Filters;
 using AForge.Imaging.Formats;
 using Kindle.Profiles;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Windows.Media.Imaging;
-using System.Drawing.Imaging;
 
 namespace mangle_port
 {
@@ -48,6 +44,133 @@ namespace mangle_port
             output.Save(outputFilePath);
 
             return true;
+        }
+
+        public static ITargetBlock<FileConversionInfo> CreateImageProcessingNetwork(KindleProfile profile, CancellationToken cancel)
+        {
+            //
+            // Create the dataflow blocks that form the network.
+            //
+
+            var fileInfoBlock = new BroadcastBlock<FileConversionInfo>(fileInfo => fileInfo, new DataflowBlockOptions() { CancellationToken = cancel});
+
+            // Create a dataflow block that takes a folder path as input
+            // and returns a Bitmap object.
+            var loadBitmap = new TransformBlock<FileConversionInfo, Bitmap>(fileInfo =>
+            {
+                try
+                {
+                    return ImageDecoder.DecodeFromFile(fileInfo.InputFilePath);
+                }
+                catch (OperationCanceledException)
+                {
+                    // Handle cancellation by passing null to the next stage
+                    // of the network.
+                    return null;
+                }
+            }, new ExecutionDataflowBlockOptions() { CancellationToken = cancel, MaxDegreeOfParallelism = DataflowBlockOptions.Unbounded });
+
+            // Create a dataflow block that takes a Bitmap object
+            // and rotates it.
+            var createRotatedBitmap = new TransformBlock<Bitmap, Bitmap>(bitmap =>
+            {
+                try
+                {
+                    return RotateImage(profile, bitmap);
+                }
+                catch (OperationCanceledException)
+                {
+                    // Handle cancellation by passing null to the next stage
+                    // of the network.
+                    return null;
+                }
+            }, new ExecutionDataflowBlockOptions() { CancellationToken = cancel, MaxDegreeOfParallelism = DataflowBlockOptions.Unbounded });
+
+            // Create a dataflow block that takes a Bitmap object
+            // and resizes it.
+            var createResizedBitmap = new TransformBlock<Bitmap, Bitmap>(bitmap =>
+            {
+                try
+                {
+                    return ResizeImage(profile, bitmap);
+                }
+                catch (OperationCanceledException)
+                {
+                    // Handle cancellation by passing null to the next stage
+                    // of the network.
+                    return null;
+                }
+            }, new ExecutionDataflowBlockOptions() { CancellationToken = cancel, MaxDegreeOfParallelism = DataflowBlockOptions.Unbounded });
+
+            // Create a dataflow block that takes a collection of Bitmap objects
+            // and resizes them.
+            var createQuantizedBitmap = new TransformBlock<Bitmap, Bitmap>(bitmap =>
+            {
+                try
+                {
+                    return QuantizeImage(profile, bitmap);
+                }
+                catch (OperationCanceledException)
+                {
+                    // Handle cancellation by passing null to the next stage
+                    // of the network.
+                    return null;
+                }
+            }, new ExecutionDataflowBlockOptions() { CancellationToken = cancel, MaxDegreeOfParallelism = DataflowBlockOptions.Unbounded });
+
+            var joinBlock = new JoinBlock<FileConversionInfo, Bitmap>();
+
+            // Create a dataflow block that displays the provided bitmap on the form.
+            var saveBitmap = new ActionBlock<Tuple<FileConversionInfo, Bitmap>>(tuple =>
+            {
+                var bitmap = tuple.Item2;
+                bitmap.Save(tuple.Item1.OutputPath);
+            }, new ExecutionDataflowBlockOptions() { CancellationToken = cancel });
+
+            // Create a dataflow block that responds to a cancellation request
+            var operationCancelled = new ActionBlock<object>(delegate
+            {
+                // Display the error image to indicate that the operation
+                // was cancelled.
+
+                // TODO
+            });
+
+            //
+            // Connect the network.
+            //
+
+            fileInfoBlock.LinkTo(loadBitmap);
+            fileInfoBlock.LinkTo(joinBlock.Target1);
+
+            // Link loadBitmaps to createRotatedBitmap.
+            // The provided predicate ensures that createRotatedBitmap accepts the
+            // bitmap only if that bitmap is not null.
+            loadBitmap.LinkTo(createRotatedBitmap, bitmap => bitmap != null);
+
+            // Also link loadBitmaps to operationCancelled.
+            // When createRotatedBitmap rejects the message, loadBitmaps
+            // offers the message to operationCancelled.
+            // operationCancelled accepts all messages because we do not provide a
+            // predicate.
+            loadBitmap.LinkTo(operationCancelled);
+
+            createRotatedBitmap.LinkTo(createResizedBitmap, bitmap => bitmap != null);
+
+            createRotatedBitmap.LinkTo(operationCancelled);
+
+            createResizedBitmap.LinkTo(createQuantizedBitmap, bitmap => bitmap != null);
+
+            createResizedBitmap.LinkTo(operationCancelled);
+
+            createQuantizedBitmap.LinkTo(joinBlock.Target2, bitmap => bitmap != null);
+
+            createQuantizedBitmap.LinkTo(operationCancelled);
+
+            joinBlock.LinkTo(saveBitmap);
+
+            // Return the head of the network.
+            return fileInfoBlock;
         }
 
         public static Bitmap QuantizeImage(KindleProfile profile, Bitmap image)

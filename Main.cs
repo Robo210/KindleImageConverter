@@ -15,8 +15,7 @@ namespace mangle_port
             MainWindowViewModel viewModel = new MainWindowViewModel();
 
             myWindow.DataContext = viewModel;
-            myWindow.Show();
-            myApp.Run();
+            myApp.Run(myWindow);
         }
     }
 }
