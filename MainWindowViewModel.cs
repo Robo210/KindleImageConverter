@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -52,7 +53,20 @@ namespace mangle_port
         public static readonly DependencyProperty SelectedImageProperty = DependencyProperty.Register(
             "SelectedImage",
             typeof(FileConversionInfo),
-            typeof(MainWindowViewModel));
+            typeof(MainWindowViewModel),
+            new PropertyMetadata((s, e) => ((MainWindowViewModel)s).OnSelectedImageChanged(e)));
+
+        public void OnSelectedImageChanged(DependencyPropertyChangedEventArgs e)
+        {
+            if (this.SelectedImage != null)
+            {
+                this.RemoveFilesVisibility = Visibility.Visible;
+            }
+            else
+            {
+                this.RemoveFilesVisibility = Visibility.Collapsed;
+            }
+        }
 
         public FileConversionInfo SelectedImage
         {
@@ -66,9 +80,47 @@ namespace mangle_port
             }
         }
 
+        // TODO: Rename to RemoveFilesIsVisible
+        // RemoveFilesVisibilityProperty
+        public static readonly DependencyProperty RemoveFilesVisibilityProperty = DependencyProperty.Register(
+            "RemoveFilesVisibility",
+            typeof(Visibility),
+            typeof(MainWindowViewModel),
+            new PropertyMetadata(Visibility.Collapsed));
+
+        public Visibility RemoveFilesVisibility
+        {
+            get
+            {
+                return (Visibility)GetValue(RemoveFilesVisibilityProperty);
+            }
+            private set
+            {
+                SetValue(RemoveFilesVisibilityProperty, value);
+            }
+        }
+
+        public static readonly DependencyProperty ExportIsEnabledProperty = DependencyProperty.Register(
+            "ExportIsEnabled",
+            typeof(bool),
+            typeof(MainWindowViewModel));
+
+        public bool ExportIsEnabled
+        {
+            get
+            {
+                return (bool)GetValue(ExportIsEnabledProperty);
+            }
+            set
+            {
+                SetValue(ExportIsEnabledProperty, value);
+            }
+        }
+
         public MainWindowViewModel()
         {
             this.fileList = new ObservableCollection<FileConversionInfo>();
+            this.fileList.CollectionChanged += fileList_CollectionChanged;
             ImageFileList = this.fileList;
 
             this.cancellationToken = new CancellationToken();
@@ -88,6 +140,18 @@ namespace mangle_port
             this._CommandBindings.Add(moveUpBinding);
             this._CommandBindings.Add(moveDownBinding);
             //CommandManager.RegisterClassCommandBinding(typeof(MainWindowViewModel), addFilesBinding);
+        }
+
+        private void fileList_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (this.fileList.Count > 0)
+            {
+                this.ExportIsEnabled = true;
+            }
+            else
+            {
+                this.ExportIsEnabled = false;
+            }
         }
 
         private string GetOutputName(int i)
