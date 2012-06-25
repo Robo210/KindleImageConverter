@@ -17,8 +17,6 @@ namespace mangle_port
     public class MainWindowViewModel : DependencyObject
     {
         private ObservableCollection<FileConversionInfo> fileList;
-        private CancellationToken cancellationToken;
-        private bool disposed;
 
         private readonly CommandBindingCollection _CommandBindings;
 
@@ -121,8 +119,6 @@ namespace mangle_port
             this.fileList = new ObservableCollection<FileConversionInfo>();
             this.fileList.CollectionChanged += fileList_CollectionChanged;
             ImageFileList = this.fileList;
-
-            this.cancellationToken = new CancellationToken();
 
             this._CommandBindings = new CommandBindingCollection();
             CommandBinding newBinding = new CommandBinding(ApplicationCommands.New, NewCmdExecuted, (s, e) => e.CanExecute = true);
@@ -288,6 +284,8 @@ namespace mangle_port
                 byte[] info = new UTF8Encoding(true).GetBytes(output);
                 file.Write(info, 0, info.Length);
             }
+
+            progressBar.CancellationTokenSource = new CancellationTokenSource();
 
             foreach (FileConversionInfo fileInfo in fileList)
             {

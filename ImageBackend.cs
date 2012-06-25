@@ -4,6 +4,7 @@ using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Threading;
 using AForge.Imaging.ColorReduction;
 using AForge.Imaging.Filters;
 using AForge.Imaging.Formats;
@@ -26,18 +27,45 @@ namespace mangle_port
             return true;
         }
 
-        public static bool ConvertImage(KindleProfile profile, string inputFilePath, Stream stream, string outputFilePath)
+        public static bool ConvertImage(KindleProfile profile, string inputFilePath, Stream stream, string outputFilePath, CancellationToken cancellationToken)
         {
             System.Drawing.Image image = System.Drawing.Image.FromStream(stream);
 
             Bitmap bitmap32 = new Bitmap(image);
             Bitmap bitmap = bitmap32.Clone(new Rectangle(0, 0, bitmap32.Width, bitmap32.Height), PixelFormat.Format24bppRgb);
 
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return false;
+            }
 
             Bitmap rotated = RotateImage(profile, bitmap);
+
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return false;
+            }
+
             Bitmap resized = ResizeImage(profile, rotated);
+
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return false;
+            }
+
             Bitmap quantized = QuantizeImage(profile, resized);
+
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return false;
+            }
+
             Bitmap output = quantized.Clone(new Rectangle(0, 0, quantized.Width, quantized.Height), PixelFormat.Format8bppIndexed);
+
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return false;
+            }
 
             output.Save(outputFilePath);
 

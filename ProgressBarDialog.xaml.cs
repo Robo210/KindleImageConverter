@@ -28,6 +28,12 @@ namespace mangle_port
             set;
         }
 
+        public CancellationTokenSource CancellationTokenSource
+        {
+            get;
+            set;
+        }
+
         private int progress;
 
         public int Progress
@@ -51,6 +57,7 @@ namespace mangle_port
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            this.CancellationTokenSource.Cancel();
             this.Close();
         }
     }

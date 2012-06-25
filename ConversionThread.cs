@@ -18,7 +18,7 @@ namespace mangle_port
                 {
                     if (fileInfo.FileStream != null)
                     {
-                        ImageBackend.ConvertImage(KindleProfiles.Kindle3, fileInfo.InputFilePath, fileInfo.FileStream, fileInfo.OutputPath);
+                        ImageBackend.ConvertImage(KindleProfiles.Kindle3, fileInfo.InputFilePath, fileInfo.FileStream, fileInfo.OutputPath, progressViewModel.CancellationTokenSource.Token);
                     }
                     else
                     {
