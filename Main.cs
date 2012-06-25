@@ -15,6 +15,7 @@ namespace mangle_port
             MainWindowViewModel viewModel = new MainWindowViewModel();
 
             myWindow.DataContext = viewModel;
+            myApp.ShutdownMode = System.Windows.ShutdownMode.OnMainWindowClose;
             myApp.Run(myWindow);
         }
     }

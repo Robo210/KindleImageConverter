@@ -8,7 +8,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks.Dataflow;
 using System.Windows;
 using System.Windows.Input;
 using Ionic.Zip;
@@ -18,8 +17,8 @@ namespace mangle_port
     public class MainWindowViewModel : DependencyObject
     {
         private ObservableCollection<FileConversionInfo> fileList;
-        private ITargetBlock<FileConversionInfo> conversionBlock;
         private CancellationToken cancellationToken;
+        private bool disposed;
 
         private readonly CommandBindingCollection _CommandBindings;
 
@@ -124,7 +123,6 @@ namespace mangle_port
             ImageFileList = this.fileList;
 
             this.cancellationToken = new CancellationToken();
-            this.conversionBlock = ImageBackend.CreateImageProcessingNetwork(new Kindle.Profiles.Kindle3(), cancellationToken);
 
             this._CommandBindings = new CommandBindingCollection();
             CommandBinding newBinding = new CommandBinding(ApplicationCommands.New, NewCmdExecuted, (s, e) => e.CanExecute = true);
@@ -139,7 +137,6 @@ namespace mangle_port
             this._CommandBindings.Add(exportFilesBinding);
             this._CommandBindings.Add(moveUpBinding);
             this._CommandBindings.Add(moveDownBinding);
-            //CommandManager.RegisterClassCommandBinding(typeof(MainWindowViewModel), addFilesBinding);
         }
 
         private void fileList_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -156,10 +153,6 @@ namespace mangle_port
 
         private string GetOutputName(int i)
         {
-            //string filePath = fileInfo.InputFilePath;
-            //string fileName = Path.GetFileNameWithoutExtension(filePath);
-            //string outputFileName = Path.ChangeExtension(fileName + "_small", "jpg");
-
             return string.Format("{0:D3}.png", i);
         }
 
@@ -294,22 +287,16 @@ namespace mangle_port
                 string output = string.Format("LAST=/mnt/us/pictures/{0}/{1}", folderName, fileList.First().OutputName);
                 byte[] info = new UTF8Encoding(true).GetBytes(output);
                 file.Write(info, 0, info.Length);
-            } 
-
-            //foreach (FileConversionInfo fileInfo in fileList)
-            //{
-            //    fileInfo.OutputPath = Path.Combine(folder, fileInfo.OutputName);
-            //    ConversionThread thread = new ConversionThread(progressBar);
-            //    ThreadPool.QueueUserWorkItem(thread.ThreadCallback, fileInfo);
-            //}
+            }
 
             foreach (FileConversionInfo fileInfo in fileList)
             {
                 fileInfo.OutputPath = Path.Combine(folder, fileInfo.OutputName);
-                this.conversionBlock.Post(fileInfo);
+                ConversionThread thread = new ConversionThread(progressBar);
+                ThreadPool.QueueUserWorkItem(thread.ThreadCallback, fileInfo);
             }
-            
-            //progressBar.ShowDialog();
+
+            progressBar.ShowDialog();
         }
 
         void ExportFilesCanExecute(object sender, CanExecuteRoutedEventArgs e)
