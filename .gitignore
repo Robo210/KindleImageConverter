@@ -29,3 +29,6 @@ _ReSharper*/
 [Tt]est[Rr]esult*
 # Don't include NuGet Packages
 packages/
+Resources/
+deps/
+FolderBrowserDialogEx.*
