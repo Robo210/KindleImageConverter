@@ -7,7 +7,7 @@
              xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
              xmlns:local="clr-namespace:mangle_port"
              mc:Ignorable="d"
-             d:DesignHeight="300" d:DesignWidth="300"
+             d:DesignHeight="300" d:DesignWidth="600"
              local:AttachedProperties.RegisterCommandBindings="{Binding CommandBindings}">
     <Controls:MetroContentControl.Resources>
         <ResourceDictionary>
@@ -16,7 +16,7 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.AnimatedSingleRowTabControl.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/Resources/Icons.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Icons.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
             </ResourceDictionary.MergedDictionaries>
@@ -42,24 +42,29 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type Button}">
-                            <Grid x:Name="grid"
-                                  Background="#02FFFFFF">
-                                <Ellipse x:Name="ellipsebg"
-                                         Margin="4"
+                            <StackPanel>
+                                <Grid x:Name="grid"
+                                      Background="#02FFFFFF"
+                                      MinWidth="{Binding ActualHeight, ElementName=grid}"
+                                      MinHeight="{Binding ActualWidth, ElementName=grid}">
+                                    <Ellipse x:Name="ellipsebg"
+                                         Margin="8"
                                          Stroke="{TemplateBinding Foreground}"
                                          StrokeThickness="0"
                                          VerticalAlignment="Stretch" />
-                                <Ellipse x:Name="ellipse"
-                                         Margin="4"
+                                    <Ellipse x:Name="ellipse"
+                                         Margin="8"
                                          Stroke="{TemplateBinding Foreground}"
                                          StrokeThickness="2"
                                          VerticalAlignment="Stretch" />
-                                <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                    <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                           Margin="{TemplateBinding Padding}"
                                           RecognizesAccessKey="True"
                                           SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
                                           VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
-                            </Grid>
+                                </Grid>
+                                <TextBlock HorizontalAlignment="Center" Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Button}}, Path=ToolTip}" />
+                            </StackPanel>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsPressed"
                                          Value="True">
@@ -161,69 +166,75 @@
             </MenuItem>
         </Menu>-->
         <DockPanel DockPanel.Dock="Bottom">
-            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Background="{DynamicResource AccentColorBrush}">
                 <Button Style="{DynamicResource MetroCircleButtonStyle}"
-            		    Height="55"
-                        Width="55"
+                        Width="60"
+                        Margin="5"
                         VerticalAlignment="Top"
+                        ToolTip="Move up"
                         Visibility="{Binding RemoveFilesVisibility}"
                         Command="ComponentCommands.MoveUp">
-                    <Rectangle Width="28" Height="28">
+                    <Rectangle Width="24" Height="24">
                         <Rectangle.Fill>
                             <VisualBrush Stretch="Fill"	Visual="{StaticResource appbar_arrow_up}" />
                         </Rectangle.Fill>
                     </Rectangle>
                 </Button>
                 <Button Style="{DynamicResource MetroCircleButtonStyle}"
-            		    Height="55"
-                        Width="55"
+                        Width="60"
+                        Margin="5"
                         VerticalAlignment="Top"
+                        ToolTip="Move down"
                         Visibility="{Binding RemoveFilesVisibility}"
                         Command="ComponentCommands.MoveDown">
-                    <Rectangle Width="28" Height="28">
+                    <Rectangle Width="24" Height="24">
                         <Rectangle.Fill>
                             <VisualBrush Stretch="Fill"	Visual="{StaticResource appbar_arrow_down}" />
                         </Rectangle.Fill>
                     </Rectangle>
                 </Button>
                 <Button Style="{DynamicResource MetroCircleButtonStyle}"
-            		    Height="55"
-                        Width="55"
+                        Width="60"
+                        Margin="5"
                         VerticalAlignment="Top"
+                        ToolTip="Remove"
                         Visibility="{Binding RemoveFilesVisibility}"
                         Command="local:MainWindowCommands.RemoveFiles">
-                    <Rectangle Width="28" Height="28">
+                    <Rectangle Width="24" Height="24">
                         <Rectangle.Fill>
                             <VisualBrush Stretch="Fill"	Visual="{StaticResource appbar_delete}" />
                         </Rectangle.Fill>
                     </Rectangle>
                 </Button>
                 <Button Style="{DynamicResource MetroCircleButtonStyle}"
-            		    Height="55"
-                        Width="55"
+                        Width="60"
+                        Margin="5"
                         VerticalAlignment="Top"
+                        ToolTip="Add"
                         Command="local:MainWindowCommands.AddFiles">
-                    <Rectangle Width="28" Height="28">
+                    <Rectangle Width="24" Height="24">
                         <Rectangle.Fill>
                             <VisualBrush Stretch="Fill"	Visual="{StaticResource appbar_add}" />
                         </Rectangle.Fill>
                     </Rectangle>
                 </Button>
             </StackPanel>
-            <Button Style="{DynamicResource MetroCircleButtonStyle}"
-            		Height="55"
-                    Width="55"
-                    VerticalAlignment="Top"
-                    HorizontalAlignment="Left"
-                    DockPanel.Dock="Left"
-                    Visibility="{Binding ExportIsEnabled, Converter={StaticResource booleanToVisibilityConverter}}"
-                    Command="local:MainWindowCommands.ExportFiles">
-                <Rectangle Width="28" Height="28">
-                    <Rectangle.Fill>
-                        <VisualBrush Stretch="Fill"	Visual="{StaticResource appbar_save}" />
-                    </Rectangle.Fill>
-                </Rectangle>
-            </Button>
+            <StackPanel DockPanel.Dock="Left" Background="{DynamicResource AccentColorBrush}">
+                <Button Style="{DynamicResource MetroCircleButtonStyle}"
+                        Width="60"
+                        Margin="5"
+                        VerticalAlignment="Top"
+                        HorizontalAlignment="Left"
+                        ToolTip="Save"
+                        Visibility="{Binding ExportIsEnabled, Converter={StaticResource booleanToVisibilityConverter}}"
+                        Command="local:MainWindowCommands.ExportFiles">
+                    <Rectangle Width="24" Height="24">
+                        <Rectangle.Fill>
+                            <VisualBrush Stretch="Fill"	Visual="{StaticResource appbar_save}" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </Button>
+            </StackPanel>
         </DockPanel>
         <ListView ItemsSource="{Binding Path=ImageFileList, Mode=OneWay}"
                   SelectedItem="{Binding Path=SelectedImage, Mode=TwoWay}">
