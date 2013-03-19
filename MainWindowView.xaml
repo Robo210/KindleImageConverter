@@ -113,22 +113,6 @@
                             </BeginStoryboard>
                         </Trigger.EnterActions>
                     </Trigger>
-                    <!--<Trigger Property="Visibility" Value="Collapsed">
-                        <Trigger.EnterActions>
-                            <BeginStoryboard>
-                                <Storyboard>
-                                    <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                                                     From="1.0"
-                                                     To="0.0"
-                                                     Duration="0:0:2.0">
-                                        <DoubleAnimation.EasingFunction>
-                                            <ExponentialEase Exponent="9" EasingMode="EaseOut" />
-                                        </DoubleAnimation.EasingFunction>
-                                    </DoubleAnimation>
-                                </Storyboard>
-                            </BeginStoryboard>
-                        </Trigger.EnterActions>
-                    </Trigger>-->
                 </Style.Triggers>
             </Style>
             
@@ -240,41 +224,42 @@
                   SelectedItem="{Binding Path=SelectedImage, Mode=TwoWay}">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Filename"
-                                    DisplayMemberBinding="{Binding DisplayName}"/>
-                    <GridViewColumn Header="Output Filename"
-                                    DisplayMemberBinding="{Binding OutputName}"/>
+                    <GridViewColumn Header="Filename">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock FontFamily="Segoe UI" FontSize="14" Foreground="DimGray" Text="{Binding DisplayName}" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Output Filename">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock FontFamily="Segoe UI" FontSize="14" Foreground="DimGray" Text="{Binding OutputName}" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
                 </GridView>
             </ListView.View>
+            <ListView.ItemContainerStyle>
+                <Style TargetType="{x:Type ListViewItem}">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type ListViewItem}">
+                                <StackPanel Background="WhiteSmoke" Orientation="Horizontal" Margin="5,0">
+                                    <Rectangle Name="rect" Width="3" Fill="White" />
+                                    <GridViewRowPresenter Content="{TemplateBinding Content}"
+                                                          Columns="{TemplateBinding GridView.ColumnCollection}"/>
+                                </StackPanel>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsSelected" Value="true">
+                                        <Setter Property="Fill" Value="{DynamicResource AccentColorBrush}" TargetName="rect" />
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ListView.ItemContainerStyle>
         </ListView>
-        <!--<ListBox ItemsSource="{Binding Path=ImageFileList, Mode=OneWay}"
-                 SelectedItem="{Binding Path=SelectedImage, Mode=TwoWay}">
-            <ListBox.ItemTemplate>
-                <DataTemplate DataType="FileConversionInfo">
-                    <DockPanel>
-                        <TextBlock Text="{Binding Path=DisplayName, Mode=OneWay}"
-                                   DockPanel.Dock="Left" />
-                        <TextBlock Text="{Binding Path=OutputName, Mode=OneWay}"
-                                   DockPanel.Dock="Right" />
-                        <DockPanel.ContextMenu>
-                            <ContextMenu>
-                                <MenuItem Header="Up"
-                                          Command="ComponentCommands.MoveUp" />
-                                <MenuItem Header="Down"
-                                          Command="ComponentCommands.MoveDown" />
-                                <MenuItem Header="Remove"
-                                          Command="local:MainWindowCommands.RemoveFiles" />
-                            </ContextMenu>
-                        </DockPanel.ContextMenu>
-                    </DockPanel>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-            <ListBox.ContextMenu>
-                <ContextMenu>
-                    <MenuItem Header="Add Files..."
-                              Command="local:MainWindowCommands.AddFiles" />
-                </ContextMenu>
-            </ListBox.ContextMenu>
-        </ListBox>-->
     </DockPanel>
 </Controls:MetroContentControl>
