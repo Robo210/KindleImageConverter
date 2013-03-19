@@ -32,3 +32,5 @@ packages/
 Resources/
 deps/
 FolderBrowserDialogEx.*
+Entypo.ttf
+Icons.xaml
