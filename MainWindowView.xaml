@@ -260,6 +260,24 @@
                     </Setter>
                 </Style>
             </ListView.ItemContainerStyle>
+            <ListView.Style>
+                <Style TargetType="ListView">
+                    <Style.Triggers>
+                        <Trigger Property="HasItems" Value="False">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListView">
+                                        <StackPanel Margin="10">
+                                            <TextBlock FontFamily="Segoe UI" FontSize="20" Foreground="DimGray" Text="no images"/>
+                                            <TextBlock FontFamily="Segoe UI" FontSize="14" Foreground="DimGray" Text="add images to convert"/>
+                                        </StackPanel>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </ListView.Style>
         </ListView>
     </DockPanel>
 </Controls:MetroContentControl>
