@@ -180,7 +180,7 @@ namespace mangle_port
                     }
                 }
             }
-            else
+            else if (extension == ".jpg" || extension == ".png")
             {
                 fileList.Add(new FileConversionInfo()
                     {
