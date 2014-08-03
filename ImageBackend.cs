@@ -1,5 +1,6 @@
 ﻿// (c) Kyle Sabo 2011
 
+using AForge.Imaging;
 using AForge.Imaging.ColorReduction;
 using AForge.Imaging.Filters;
 using Kindle.Profiles;
@@ -23,8 +24,7 @@ namespace mangle_port
 
             try
             {
-                Image image = Image.FromFile(inputFilePath);
-                Bitmap bitmap = new Bitmap(image);
+                Bitmap bitmap = new Bitmap(inputFilePath);
 
                 return ConvertImage_Internal(profile, bitmap, outputFilePath, cancellationToken);
             }
@@ -43,11 +43,9 @@ namespace mangle_port
 
             try
             {
-                Image image = Image.FromStream(stream);
+                Bitmap bitmap = new Bitmap(stream);
 
-                Bitmap bitmap32 = new Bitmap(image);
-
-                return ConvertImage_Internal(profile, bitmap32, outputFilePath, cancellationToken);
+                return ConvertImage_Internal(profile, bitmap, outputFilePath, cancellationToken);
             }
             catch (Exception)
             {
@@ -55,49 +53,59 @@ namespace mangle_port
             }
         }
 
-        private static bool ConvertImage_Internal(KindleProfile profile, Bitmap image, string outputFilePath, CancellationToken cancellationToken)
+        private static bool ConvertImage_Internal(KindleProfile profile, Bitmap bitmap, string outputFilePath, CancellationToken cancellationToken)
         {
-            Bitmap bitmap = image.Clone(new Rectangle(0, 0, image.Width, image.Height), PixelFormat.Format24bppRgb);
+            Bitmap bitmap24 = bitmap.Clone(new Rectangle(0, 0, bitmap.Width, bitmap.Height), PixelFormat.Format24bppRgb);
 
-            if (cancellationToken.IsCancellationRequested)
+            using (UnmanagedImage unmanagedImage = UnmanagedImage.FromManagedImage(bitmap24))
             {
-                return false;
+
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return false;
+                }
+
+                using (UnmanagedImage rotated = ImageBackend.RotateImage(profile, unmanagedImage))
+                {
+
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        return false;
+                    }
+
+                    using (UnmanagedImage resized = ImageBackend.ResizeImage(profile, rotated))
+                    {
+
+                        if (cancellationToken.IsCancellationRequested)
+                        {
+                            return false;
+                        }
+
+                        Bitmap quantized = ImageBackend.QuantizeImage(profile, resized);
+
+                        if (cancellationToken.IsCancellationRequested)
+                        {
+                            return false;
+                        }
+
+                        Bitmap output = (quantized.PixelFormat == PixelFormat.Format8bppIndexed || quantized.PixelFormat == PixelFormat.Format4bppIndexed)
+                            ? quantized
+                            : quantized.Clone(new Rectangle(0, 0, quantized.Width, quantized.Height), PixelFormat.Format8bppIndexed);
+
+                        if (cancellationToken.IsCancellationRequested)
+                        {
+                            return false;
+                        }
+
+                        output.Save(outputFilePath);
+
+                        return true;
+                    }
+                }
             }
-
-            Bitmap rotated = ImageBackend.RotateImage(profile, bitmap);
-
-            if (cancellationToken.IsCancellationRequested)
-            {
-                return false;
-            }
-
-            Bitmap resized = ImageBackend.ResizeImage(profile, rotated);
-
-            if (cancellationToken.IsCancellationRequested)
-            {
-                return false;
-            }
-
-            Bitmap quantized = ImageBackend.QuantizeImage(profile, resized);
-
-            if (cancellationToken.IsCancellationRequested)
-            {
-                return false;
-            }
-
-            Bitmap output = quantized.Clone(new Rectangle(0, 0, quantized.Width, quantized.Height), PixelFormat.Format8bppIndexed);
-
-            if (cancellationToken.IsCancellationRequested)
-            {
-                return false;
-            }
-
-            output.Save(outputFilePath);
-
-            return true;
         }
 
-        private static Bitmap QuantizeImage(KindleProfile profile, Bitmap image)
+        private static Bitmap QuantizeImage(KindleProfile profile, UnmanagedImage image)
         {
             Bitmap output;
             FloydSteinbergColorDithering dithering = new FloydSteinbergColorDithering();
@@ -108,9 +116,9 @@ namespace mangle_port
             return output;
         }
 
-        private static Bitmap ResizeImage(KindleProfile profile, Bitmap image)
+        private static UnmanagedImage ResizeImage(KindleProfile profile, UnmanagedImage image)
         {
-            Bitmap output;
+            UnmanagedImage output;
             ResizeBicubic filter;
 
             if (image.Width > image.Height)
@@ -133,11 +141,11 @@ namespace mangle_port
             return output;
         }
 
-        private static Bitmap RotateImage(KindleProfile profile, Bitmap image)
+        private static UnmanagedImage RotateImage(KindleProfile profile, UnmanagedImage image)
         {
             if (image.Width > image.Height)
             {
-                Bitmap output;
+                UnmanagedImage output;
                 RotateBicubic filter = new RotateBicubic(90);
 
                 output = filter.Apply(image);
