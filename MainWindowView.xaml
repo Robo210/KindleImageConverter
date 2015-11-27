@@ -5,19 +5,23 @@
                               xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                               xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                               xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+                              xmlns:myControls="clr-namespace:MyControls"
                               xmlns:local="clr-namespace:mangle_port"
                               mc:Ignorable="d"
-                              d:DesignHeight="300" d:DesignWidth="600"
+                              d:DesignHeight="550" d:DesignWidth="800"
                               AllowDrop="True"
                               local:AttachedProperties.RegisterCommandBindings="{Binding CommandBindings}">
     <Controls:MetroContentControl.Resources>
         <ResourceDictionary>
+            <Color x:Key="BackgroundBlue">#02FFFFFF</Color>
+            <SolidColorBrush x:Key="DockBackgroundBrush" Color="{StaticResource BackgroundBlue}" />
+            
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.AnimatedSingleRowTabControl.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/Icons.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Resources/Icons.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
             </ResourceDictionary.MergedDictionaries>
@@ -25,6 +29,13 @@
     </Controls:MetroContentControl.Resources>
     <DockPanel>
         <DockPanel.Resources>
+            <Style TargetType="{x:Type Button}">
+                <!-- Set up a default style so the terrible one in the resources isn't used -->
+                <Setter Property="Background"
+                        Value="{DynamicResource ButtonNormalBackground}" />
+                <Setter Property="BorderBrush"
+                        Value="{DynamicResource ButtonNormalBorder}" />
+            </Style>
             <!-- style for WP7/Circle button -->
             <Style x:Key="MetroCircleButtonStyle"
                    TargetType="{x:Type Button}">
@@ -45,7 +56,7 @@
                         <ControlTemplate TargetType="{x:Type Button}">
                             <StackPanel>
                                 <Grid x:Name="grid"
-                                      Background="#02FFFFFF"
+                                      Background="{StaticResource DockBackgroundBrush}"
                                       MinWidth="{Binding ActualHeight, ElementName=grid}"
                                       MinHeight="{Binding ActualWidth, ElementName=grid}">
                                     <Ellipse x:Name="ellipsebg"
@@ -116,42 +127,213 @@
                     </Trigger>
                 </Style.Triggers>
             </Style>
-            
+            <Style TargetType="{x:Type myControls:SplitButton}">
+                <Setter Property="Background"
+                        Value="{StaticResource DockBackgroundBrush}" />
+                <Setter Property="BorderThickness"
+                        Value="1" />
+                <Setter Property="HorizontalContentAlignment"
+                        Value="Center" />
+                <Setter Property="VerticalContentAlignment"
+                        Value="Center" />
+                <Setter Property="Padding"
+                        Value="1" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type myControls:SplitButton}">
+                            <Grid x:Name="PART_Container"
+                                  VerticalAlignment="Stretch"
+                                  Background="Transparent">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="60" /> <!-- Set to 60 rather than * so the Designer view doesn't throw a fit -->
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Grid x:Name="PART_Button"
+                                      Grid.Column="0"
+                                      Grid.Row="0"
+                                      Width="60"
+                                      Background="{StaticResource DockBackgroundBrush}"
+                                      MinWidth="{Binding ActualHeight, ElementName=PART_Button}"
+                                      MinHeight="{Binding ActualWidth, ElementName=PART_Button}">
+                                    <Ellipse x:Name="ellipsebg"
+                                             Margin="8"
+                                             Stroke="{TemplateBinding Foreground}"
+                                             StrokeThickness="0"
+                                             VerticalAlignment="Stretch" />
+                                    <Ellipse x:Name="ellipse"
+                                             Margin="8"
+                                             Stroke="{TemplateBinding Foreground}"
+                                             StrokeThickness="2"
+                                             VerticalAlignment="Stretch" />
+                                    <ContentPresenter HorizontalAlignment="Center"
+                                                      VerticalAlignment="Center"
+                                                      Margin="{TemplateBinding Padding}"
+                                                      RecognizesAccessKey="True"
+                                                      SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                                      Content="{TemplateBinding Icon}"/>
+                                </Grid>
+                                <ContentControl x:Name="PART_ButtonContent"
+                                                MinWidth="50" 
+                                                Margin="2"
+                                                Grid.Column="1"
+                                                Grid.Row="0"
+                                                HorizontalAlignment="Stretch"
+                                                VerticalContentAlignment="{Binding VerticalContentAlignment, RelativeSource={RelativeSource TemplatedParent}}"
+                                                VerticalAlignment="{Binding VerticalContentAlignment, RelativeSource={RelativeSource TemplatedParent}}"
+                                                ContentStringFormat="{TemplateBinding ItemStringFormat}"
+                                                ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                                                Content="{Binding SelectedItem, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                                ContentTemplate="{TemplateBinding ItemTemplate}" />
+                                <Button x:Name="PART_Expander"
+                                        Grid.Column="2"
+                                        Grid.Row="0"
+                                        Grid.RowSpan="2"
+                                        VerticalAlignment="Stretch"
+                                        Width="25"
+                                        HorizontalAlignment="Stretch"
+                                        Background="{DynamicResource ButtonNormalBackground}"
+                                        HorizontalContentAlignment="Center"
+                                        VerticalContentAlignment="Center">
+                                    <Button.Content>
+                                        <Rectangle Name="PART_Rectangle"
+                                                Height="6"
+                                                Width="10"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                Fill="{DynamicResource BlackColorBrush}">
+                                        <Rectangle.OpacityMask>
+                                            <VisualBrush Stretch="Fill">
+                                                <VisualBrush.Visual>
+                                                    <Canvas Width="18"
+                                                            Height="18"
+                                                            Clip="F1 M 0,0L 48,0L 48,48L 0,48L 0,0"
+                                                            UseLayoutRounding="False">
+                                                        <Path Width="18"
+                                                                Height="16"
+                                                                Canvas.Left="14.9063"
+                                                                Canvas.Top="15.75"
+                                                                Stretch="Fill"
+                                                                Fill="{DynamicResource BlackColorBrush}"
+                                                                Data="F1 M 23.9063,25L 25.9063,23L 32.9063,15.75L 32.9063,22.25L 23.9062,31.75L 14.9063,22.25L 14.9063,15.75L 21.9063,23L 23.9063,25 Z " />
+                                                    </Canvas>
+                                                </VisualBrush.Visual>
+                                            </VisualBrush>
+                                        </Rectangle.OpacityMask>
+                                    </Rectangle>
+                                    </Button.Content>
+                                </Button>
+                                <TextBlock HorizontalAlignment="Center"
+                                           Grid.Row="1"
+                                           Grid.Column="0"
+                                           Grid.ColumnSpan="3"
+                                           Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type myControls:SplitButton}}, Path=ToolTip}" />
+                                <Popup Name="PART_Popup"
+                                       IsOpen="{Binding IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                       PlacementTarget="{Binding ElementName=PART_ButtonContent}"
+                                       PopupAnimation="Fade"
+                                       MinWidth="{TemplateBinding ActualWidth}"
+                                       StaysOpen="True">
+                                    <ListBox x:Name="PART_ListBox"
+                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                BorderThickness="{TemplateBinding BorderThickness}"
+                                                Style="{DynamicResource VirtualisedMetroListBox}"
+                                                SelectionMode="Single"
+                                                SelectedItem="{Binding SelectedItem, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                                SelectedIndex="{Binding SelectedIndex, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                                DisplayMemberPath="{TemplateBinding DisplayMemberPath}"
+                                                ItemTemplate="{TemplateBinding ItemTemplate}"
+                                                ItemTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                                                ItemStringFormat="{TemplateBinding ItemStringFormat}"
+                                                ItemContainerStyle="{TemplateBinding ItemContainerStyle}"
+                                                ItemContainerStyleSelector="{TemplateBinding ItemContainerStyleSelector}"
+                                                ItemsSource="{TemplateBinding ItemsSource}" />
+                                </Popup>
+                            </Grid>
+                            <ControlTemplate.Triggers>
+                                <!--
+                                    <Trigger Property="IsPressed"
+                                         Value="True">
+                                        <Setter TargetName="ellipsebg"
+                                            Property="Fill"
+                                            Value="{DynamicResource BlackBrush}" />
+                                        <Setter TargetName="ellipsebg"
+                                            Property="Opacity"
+                                            Value="0.2" />
+                                    </Trigger>
+                                    <Trigger Property="IsKeyboardFocused"
+                                         Value="true" />
+                                    <Trigger Property="ToggleButton.IsChecked"
+                                         Value="true" />
+                                    <Trigger Property="IsEnabled"
+                                         Value="false">
+                                        <Setter Property="Foreground"
+                                            Value="#ADADAD" />
+                                    </Trigger>-->
+                                <!--<Trigger Property="IsFocused"
+                                         Value="True"
+                                         SourceName="PART_Button">
+                                    <Setter Property="BorderBrush"
+                                            Value="{DynamicResource AccentColorBrush}"
+                                            TargetName="PART_Border" />
+                                </Trigger>
+                                <Trigger Property="IsFocused"
+                                         Value="True"
+                                         SourceName="PART_Expander">
+                                    <Setter Property="BorderBrush"
+                                            Value="{DynamicResource AccentColorBrush}"
+                                            TargetName="PART_Border" />
+                                </Trigger>-->
+                                <Trigger Property="IsMouseOver"
+                                         Value="True"
+                                         SourceName="PART_Container">
+                                    <Setter TargetName="ellipse"
+                                            Property="Opacity"
+                                            Value="1" />
+                                    <Setter TargetName="PART_Rectangle"
+                                            Property="Opacity"
+                                            Value="1" />
+                                </Trigger>
+                                <Trigger Property="IsMouseOver"
+                                         Value="False"
+                                         SourceName="PART_Container">
+                                    <Setter TargetName="ellipse"
+                                            Property="Opacity"
+                                            Value=".5" />
+                                    <Setter TargetName="PART_Rectangle"
+                                            Property="Opacity"
+                                            Value=".5" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
             <BooleanToVisibilityConverter x:Key="booleanToVisibilityConverter" />
         </DockPanel.Resources>
-        <!--<Menu DockPanel.Dock="Top">
-            <MenuItem Header="File">
-                <MenuItem Header="New"
-                          Command="ApplicationCommands.New" />
-                <MenuItem Header="Open..."
-                          Command="ApplicationCommands.Open" />
-                <MenuItem Header="Save"
-                          Command="ApplicationCommands.Save" />
-                <MenuItem Header="Save as..."
-                          Command="ApplicationCommands.SaveAs" />
-            </MenuItem>
-            <MenuItem Header="Book">
-                <MenuItem Header="Options..." />
-                <MenuItem Header="Add">
-                    <MenuItem Header="Add Files..." 
-                              Command="local:MainWindowCommands.AddFiles" />
-                    <MenuItem Header="Add Directory..."
-                              Command="local:MainWindowCommands.AddDirectory" />
-                </MenuItem>
-                <MenuItem Header="Remove"
-                          Command="local:MainWindowCommands.RemoveFiles" />
-                <MenuItem Header="Shift">
-                    <MenuItem Header="Up"
-                              Command="ComponentCommands.MoveUp" />
-                    <MenuItem Header="Down"
-                              Command="ComponentCommands.MoveDown" />
-                </MenuItem>
-                <MenuItem Header="Export..."
-                          Command="local:MainWindowCommands.ExportFiles" />
-            </MenuItem>
-        </Menu>-->
         <DockPanel DockPanel.Dock="Bottom">
             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Background="{DynamicResource AccentColorBrush}">
+                <myControls:SplitButton VerticalContentAlignment="Center"
+                                      HorizontalContentAlignment="Left"
+                                      Margin="5"
+                                      VerticalAlignment="Top"
+                                      DisplayMemberPath="Name"
+                                      ToolTip="Kindle Type"
+                                      SelectedItem="{Binding Path=SelectedProfile, Mode=TwoWay}"
+                                      ItemsSource="{Binding Profiles}">
+                    <myControls:SplitButton.Icon>
+                        <Rectangle Width="24" Height="24">
+                            <Rectangle.Fill>
+                                <VisualBrush Stretch="Fill"	Visual="{StaticResource appbar_book_list}" />
+                            </Rectangle.Fill>
+                        </Rectangle>
+                    </myControls:SplitButton.Icon>
+                </myControls:SplitButton>
                 <Button Style="{DynamicResource MetroCircleButtonStyle}"
                         Width="60"
                         Margin="5"
@@ -253,7 +435,7 @@
                     <Setter Property="Template">
                         <Setter.Value>
                             <ControlTemplate TargetType="{x:Type ListViewItem}">
-                                <StackPanel Background="WhiteSmoke" Orientation="Horizontal">
+                                <StackPanel Name="selected" Background="WhiteSmoke" Orientation="Horizontal">
                                     <Rectangle Name="rect" Width="3" Fill="White" />
                                     <GridViewRowPresenter Content="{TemplateBinding Content}"
                                                           Columns="{TemplateBinding GridView.ColumnCollection}"/>
@@ -261,6 +443,7 @@
                                 <ControlTemplate.Triggers>
                                     <Trigger Property="IsSelected" Value="true">
                                         <Setter Property="Fill" Value="{DynamicResource AccentColorBrush}" TargetName="rect" />
+                                        <Setter Property="Background" Value="{DynamicResource AccentColorBrush}" TargetName="selected" />
                                     </Trigger>
                                 </ControlTemplate.Triggers>
                             </ControlTemplate>

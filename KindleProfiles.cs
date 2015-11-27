@@ -8,11 +8,6 @@ using System.Text;
 
 namespace Kindle.Profiles
 {
-    public class KindleProfiles
-    {
-        public static Kindle3 Kindle3 = new Kindle3();
-    }
-
     public abstract class KindleProfile
     {
         public Color[] Palette
@@ -20,16 +15,43 @@ namespace Kindle.Profiles
             get;
             internal set;
         }
+
         public int Width
         {
             get;
             internal set;
         }
+
         public int Height
         {
             get;
             internal set;
         }
+
+        public string Name
+        {
+            get;
+            internal set;
+        }
+
+        internal static Color[] CommonPalette = {
+            Color.FromArgb(0x00, 0x00, 0x00),
+            Color.FromArgb(0x11, 0x11, 0x11),
+            Color.FromArgb(0x22, 0x22, 0x22),
+            Color.FromArgb(0x33, 0x33, 0x33),
+            Color.FromArgb(0x44, 0x44, 0x44),
+            Color.FromArgb(0x55, 0x55, 0x55),
+            Color.FromArgb(0x66, 0x66, 0x66),
+            Color.FromArgb(0x77, 0x77, 0x77),
+            Color.FromArgb(0x88, 0x88, 0x88),
+            Color.FromArgb(0x99, 0x99, 0x99),
+            Color.FromArgb(0xAA, 0xAA, 0xAA),
+            Color.FromArgb(0xBB, 0xBB, 0xBB),
+            Color.FromArgb(0xCC, 0xCC, 0xCC),
+            Color.FromArgb(0xDD, 0xDD, 0xDD),
+            Color.FromArgb(0xEE, 0xEE, 0xEE),
+            Color.FromArgb(0xFF, 0xFF, 0xFF)
+        };
     }
 
     public class Kindle3 : KindleProfile
@@ -38,24 +60,30 @@ namespace Kindle.Profiles
         {
             Width = 600;
             Height = 800;
+            Palette = KindleProfile.CommonPalette;
+            Name = "Kindle Keyboard";
+        }
+    }
 
-            Palette = new Color[15];
+    public class KindlePaperWhite12 : KindleProfile
+    {
+        public KindlePaperWhite12()
+        {
+            Width = 758;
+            Height = 1024;
+            Palette = KindleProfile.CommonPalette;
+            Name = "Kindle PaperWhite 1/2";
+        }
+    }
 
-            Palette[0] = Color.FromArgb(0x00, 0x00, 0x00);
-            Palette[1] = Color.FromArgb(0x11, 0x11, 0x11);
-            Palette[2] = Color.FromArgb(0x22, 0x22, 0x22);
-            Palette[3] = Color.FromArgb(0x33, 0x33, 0x33);
-            Palette[4] = Color.FromArgb(0x44, 0x44, 0x44);
-            Palette[5] = Color.FromArgb(0x55, 0x55, 0x55);
-            Palette[6] = Color.FromArgb(0x66, 0x66, 0x66);
-            Palette[7] = Color.FromArgb(0x77, 0x77, 0x77);
-            Palette[8] = Color.FromArgb(0x88, 0x88, 0x88);
-            Palette[9] = Color.FromArgb(0x99, 0x99, 0x99);
-            Palette[10] = Color.FromArgb(0xAA, 0xAA, 0xAA);
-            Palette[11] = Color.FromArgb(0xBB, 0xBB, 0xBB);
-            Palette[12] = Color.FromArgb(0xCC, 0xCC, 0xCC);
-            Palette[13] = Color.FromArgb(0xDD, 0xDD, 0xDD);
-            Palette[14] = Color.FromArgb(0xFF, 0xFF, 0xFF);
+    public class KindlePaperWhite3Voyage : KindleProfile
+    {
+        public KindlePaperWhite3Voyage()
+        {
+            Width = 1072;
+            Height = 1448;
+            Palette = KindleProfile.CommonPalette;
+            Name = "Kindle PaperWhite 3 / Voyage";
         }
     }
 }

@@ -2,6 +2,7 @@
 
 using Kindle.Profiles;
 using System;
+using System.Diagnostics;
 using System.IO;
 
 namespace mangle_port
@@ -16,13 +17,16 @@ namespace mangle_port
 
                 if (fileInfo != null)
                 {
+                    Debug.Assert(fileInfo.KindleProfile != null);
+                    Debug.Assert(fileInfo.FileStream != null || fileInfo.InputFilePath != null);
+
                     if (fileInfo.FileStream != null)
                     {
-                        ImageBackend.ConvertImage(KindleProfiles.Kindle3, fileInfo.FileStream, fileInfo.OutputPath, progressViewModel.CancellationTokenSource.Token);
+                        ImageBackend.ConvertImage(fileInfo.KindleProfile, fileInfo.FileStream, fileInfo.OutputPath, progressViewModel.CancellationTokenSource.Token);
                     }
                     else
                     {
-                        ImageBackend.ConvertImage(KindleProfiles.Kindle3, fileInfo.InputFilePath, fileInfo.OutputPath, progressViewModel.CancellationTokenSource.Token);
+                        ImageBackend.ConvertImage(fileInfo.KindleProfile, fileInfo.InputFilePath, fileInfo.OutputPath, progressViewModel.CancellationTokenSource.Token);
                     }
                 }
             }

@@ -1,5 +1,6 @@
 ﻿// (c) Kyle Sabo 2011
 
+using Kindle.Profiles;
 using System;
 using System.IO;
 using System.Windows;
@@ -13,6 +14,7 @@ namespace mangle_port
         private string outputPath;
         private Stream inputStream;
         private bool disposed;
+        private KindleProfile kindleProfile;
 
         // DisplayName property
         public static readonly DependencyProperty DisplayNameProperty = DependencyProperty.Register(
@@ -85,6 +87,18 @@ namespace mangle_port
             set
             {
                 this.inputStream = value;
+            }
+        }
+
+        public KindleProfile KindleProfile
+        {
+            get
+            {
+                return this.kindleProfile;
+            }
+            set
+            {
+                this.kindleProfile = value;
             }
         }
 

@@ -11,6 +11,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Input;
 using Ionic.Zip;
+using Kindle.Profiles;
 
 namespace mangle_port
 {
@@ -25,6 +26,42 @@ namespace mangle_port
             get
             {
                 return _CommandBindings;
+            }
+        }
+
+        // Profiles property
+        public static readonly DependencyProperty ProfilesProperty = DependencyProperty.Register(
+            "Profiles",
+            typeof(IEnumerable<KindleProfile>),
+            typeof(MainWindowViewModel));
+
+        public IEnumerable<KindleProfile> Profiles
+        {
+            get
+            {
+                return (IEnumerable<KindleProfile>)GetValue(ProfilesProperty);
+            }
+            private set
+            {
+                SetValue(ProfilesProperty, value);
+            }
+        }
+
+        // SelectedProfile property
+        public static readonly DependencyProperty SelectedProfileProperty = DependencyProperty.Register(
+            "SelectedProfile",
+            typeof(KindleProfile),
+            typeof(MainWindowViewModel));
+
+        public KindleProfile SelectedProfile
+        {
+            get
+            {
+                return (KindleProfile)GetValue(SelectedProfileProperty);
+            }
+            private set
+            {
+                SetValue(SelectedProfileProperty, value);
             }
         }
 
@@ -119,6 +156,9 @@ namespace mangle_port
             this.fileList = new ObservableCollection<FileConversionInfo>();
             this.fileList.CollectionChanged += fileList_CollectionChanged;
             ImageFileList = this.fileList;
+
+            this.Profiles = new ReadOnlyObservableCollection<KindleProfile>(new ObservableCollection<KindleProfile>(new KindleProfile[] { new Kindle3(), new KindlePaperWhite12(), new KindlePaperWhite3Voyage() }));
+            this.SelectedProfile = this.Profiles.First();
 
             this._CommandBindings = new CommandBindingCollection();
             CommandBinding newBinding = new CommandBinding(ApplicationCommands.New, NewCmdExecuted, (s, e) => e.CanExecute = true);
@@ -265,13 +305,16 @@ namespace mangle_port
                 return;
             }
 
-
             ProgressBarDialog progressBar = new ProgressBarDialog()
             {
                 TotalThreads = fileList.Count
             };
 
             string folderName = Path.GetFileName(folder);
+            if (string.IsNullOrWhiteSpace(folderName))
+            {
+                folderName = Path.GetRandomFileName();
+            }
 
             using (FileStream file = File.Create(Path.Combine(folder, Path.ChangeExtension(folderName, ".manga"))))
             {
@@ -290,6 +333,7 @@ namespace mangle_port
             foreach (FileConversionInfo fileInfo in fileList)
             {
                 fileInfo.OutputPath = Path.Combine(folder, fileInfo.OutputName);
+                fileInfo.KindleProfile = this.SelectedProfile;
                 ConversionThread thread = new ConversionThread(progressBar);
                 ThreadPool.QueueUserWorkItem(thread.ThreadCallback, fileInfo);
             }
