@@ -285,7 +285,7 @@ namespace KindleImageConverter
             string folder = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
             var dlg1 = new Ionic.Utils.FolderBrowserDialogEx
             {
-                Description = "Select a folder for the extracted files:",
+                Description = "Select a location to export to:",
                 ShowNewFolderButton = true,
                 ShowEditBox = true,
                 NewStyle = true,
