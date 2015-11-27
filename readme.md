@@ -20,13 +20,13 @@ Comparison to Mangle
 In the comparison images below, notice how blotchy the face and clouds on the left are in the output from Mangle compared to the output from this software.
 
 ### Original
-![Original](Resources\original.png)
+![Original](Resources/original.png)
 
 ### Manga Converter for Kindle
-![Manga Converter for Kindle](Resources\kic.png)
+![Manga Converter for Kindle](Resources/kic.png)
 
 ### Mangle
-![Mangle](Resources\mangle.png)
+![Mangle](Resources/mangle.png)
 
 Compiling
 ---------
