@@ -5,6 +5,7 @@ Converts manga, comics, and normal images into grayscale, Kindle compatible fold
 
 Comparison to Mangle
 --------------------
+
 ##### Pros
  - Faster. Convert images using all your CPU cores.
  - Better quality dithering. Color images are converted into grayscale using high-quality dithering algorithms that better preserve shading.
@@ -26,3 +27,13 @@ In the comparison images below, notice how blotchy the face and clouds on the le
 
 ### Mangle
 ![Mangle](Resources\mangle.png)
+
+Compiling
+---------
+
+The first time you compile this software you will need to enable NuGet to download its dependencies.
+
+Downloads
+---------
+
+There are currently no pre-compiled binaries available.
