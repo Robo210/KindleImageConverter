@@ -6,7 +6,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
 
-namespace mangle_port
+namespace KindleImageConverter
 {
     /// <summary>
     /// Interaction logic for ProgressBarDialog.xaml

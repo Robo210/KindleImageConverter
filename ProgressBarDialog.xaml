@@ -1,5 +1,5 @@
 ﻿<!-- (c) Kyle Sabo 2011 -->
-<Window x:Class="mangle_port.ProgressBarDialog"
+<Window x:Class="KindleImageConverter.ProgressBarDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Progress" Height="80" Width="300">

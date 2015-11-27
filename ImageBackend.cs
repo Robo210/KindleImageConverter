@@ -11,7 +11,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Threading;
 
-namespace mangle_port
+namespace KindleImageConverter
 {
     public class ImageBackend
     {

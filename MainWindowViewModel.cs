@@ -13,7 +13,7 @@ using System.Windows.Input;
 using Ionic.Zip;
 using Kindle.Profiles;
 
-namespace mangle_port
+namespace KindleImageConverter
 {
     public class MainWindowViewModel : DependencyObject
     {

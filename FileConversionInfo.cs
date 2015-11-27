@@ -5,7 +5,7 @@ using System;
 using System.IO;
 using System.Windows;
 
-namespace mangle_port
+namespace KindleImageConverter
 {
     public class FileConversionInfo
         : DependencyObject, IDisposable

@@ -7,7 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 
-namespace mangle_port
+namespace KindleImageConverter
 {
     public partial class MainWindowView : MetroContentControl
     {

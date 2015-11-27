@@ -5,7 +5,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 
-namespace mangle_port
+namespace KindleImageConverter
 {
     class ConversionThread
     {

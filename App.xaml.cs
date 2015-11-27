@@ -5,7 +5,7 @@ using System.Data;
 using System.Linq;
 using System.Windows;
 
-namespace mangle_port
+namespace KindleImageConverter
 {
     /// <summary>
     /// Interaction logic for App.xaml

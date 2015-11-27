@@ -3,7 +3,7 @@
 using System.Windows;
 using MahApps.Metro.Controls;
 
-namespace mangle_port
+namespace KindleImageConverter
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
