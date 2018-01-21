@@ -15,6 +15,9 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
+    <Controls:MetroWindow.WindowButtonCommands>
+        <Controls:WindowButtonCommands Style="{DynamicResource MahApps.Metro.Styles.WindowButtonCommands.Win10}" />
+    </Controls:MetroWindow.WindowButtonCommands>
     <Window.Content>
         <local:MainWindowView DataContext="{Binding}" />
     </Window.Content>
