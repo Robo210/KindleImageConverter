@@ -1,8 +1,8 @@
 ﻿// (c) Kyle Sabo 2011
 
-using AForge.Imaging;
-using AForge.Imaging.ColorReduction;
-using AForge.Imaging.Filters;
+using Accord.Imaging;
+using Accord.Imaging.ColorReduction;
+using Accord.Imaging.Filters;
 using Kindle.Profiles;
 using System;
 using System.Diagnostics.Contracts;
@@ -108,8 +108,10 @@ namespace KindleImageConverter
         private static Bitmap QuantizeImage(KindleProfile profile, UnmanagedImage image)
         {
             Bitmap output;
-            FloydSteinbergColorDithering dithering = new FloydSteinbergColorDithering();
-            dithering.ColorTable = profile.Palette;
+            FloydSteinbergColorDithering dithering = new FloydSteinbergColorDithering
+            {
+                ColorTable = profile.Palette
+            };
 
             output = dithering.Apply(image);
 
